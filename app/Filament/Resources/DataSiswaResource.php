@@ -92,6 +92,7 @@ class DataSiswaResource extends Resource
                 Tables\Actions\DeleteAction::make(),
                 Action::make('raport')
                     ->label('Raport')
+                    ->color('info')
                     ->icon('heroicon-o-document-text')
                     ->modalHeading('Raport Siswa')
                     ->modalWidth('4xl')

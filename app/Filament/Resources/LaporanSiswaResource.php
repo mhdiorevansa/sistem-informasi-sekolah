@@ -9,6 +9,7 @@ use App\Models\Kelas;
 use App\Models\LaporanSiswa;
 use App\Models\MataPelajaran;
 use App\Models\NilaiLaporanSiswa;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
@@ -22,6 +23,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LaporanSiswaResource extends Resource
@@ -90,7 +92,7 @@ class LaporanSiswaResource extends Resource
                             ->options(function () {
                                 return MataPelajaran::with('kelas')
                                     ->get()
-                                    ->groupBy('kelas.nama_kelas') 
+                                    ->groupBy('kelas.nama_kelas')
                                     ->mapWithKeys(function ($mataPelajaran, $kelasNama) {
                                         $label = "Kelas $kelasNama";
                                         return [
@@ -124,10 +126,10 @@ class LaporanSiswaResource extends Resource
             ]);
     }
 
-    // public static function getEloquentQuery(): Builder
-    // {
-    //     return LaporanSiswa::whereNotIn('siswa_id', [7]);
-    // }
+    public static function getEloquentQuery(): Builder
+    {
+        return LaporanSiswa::whereNotIn('status', ['naik kelas']);
+    }
 
     public static function table(Table $table): Table
     {
@@ -154,7 +156,8 @@ class LaporanSiswaResource extends Resource
                             $values = explode(', ', $state);
                             $totalNilai = array_sum(array_map('intval', $values));
                             $jumlahMataPelajaran = $record->nilaiLaporanSiswa->count();
-                            return $jumlahMataPelajaran > 0 ? $totalNilai / $jumlahMataPelajaran : 0;
+                            $rataRataNilai = $jumlahMataPelajaran > 0 ? $totalNilai / $jumlahMataPelajaran : 0;
+                            return \number_format($rataRataNilai, 2);
                         }
                         return 0;
                     }),
@@ -171,7 +174,31 @@ class LaporanSiswaResource extends Resource
                     ->default('1'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->using(function (LaporanSiswa $record, array $data): LaporanSiswa {
+                        $record->update($data);
+                        if ($record->status === 'naik kelas') {
+                            $siswaId = $record->siswa_id;
+                            LaporanSiswa::where('siswa_id', $siswaId)->update([
+                                'status' => 'naik kelas'
+                            ]);
+                            DataSiswa::where('id', $siswaId)->update([
+                                'kelas_id' => 2,
+                            ]);
+                            $dataSiswa = DataSiswa::find($siswaId);
+                            for ($i = 1; $i <= 2; $i++) {
+                                LaporanSiswa::create([
+                                    'siswa_id' => $siswaId,
+                                    'semester' => $i,
+                                    'status' => 'belum naik kelas',
+                                    'kelas_id' => $dataSiswa->kelas_id,
+                                    'created_at' => Carbon::now(),
+                                    'updated_at' => Carbon::now()
+                                ]);
+                            };
+                        }
+                        return $record;
+                    }),
                 Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
