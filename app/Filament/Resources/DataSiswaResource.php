@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -89,6 +90,21 @@ class DataSiswaResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Action::make('raport')
+                    ->label('Raport')
+                    ->icon('heroicon-o-document-text')
+                    ->modalHeading('Raport Siswa')
+                    ->modalWidth('4xl')
+                    ->modalContent(function (DataSiswa $record) {
+                        return view('components.laporan-siswa', [
+                            'groupedRaports' => $record->laporanSiswa
+                                ->load('nilaiLaporanSiswa')
+                                ->groupBy(fn($raport) => $raport->kelas->nama_kelas . ' - Semester ' . $raport->semester),
+                            'siswa' => $record,
+                        ]);
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

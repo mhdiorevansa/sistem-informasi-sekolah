@@ -31,4 +31,24 @@ class Kelas extends Model
     {
         return $this->belongsToMany(Guru::class, 'wali_kelas', 'kelas_id', 'guru_id');
     }
+
+    /**
+     * Get all of the mataPelajaran for the Kelas
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function mataPelajaran(): HasMany
+    {
+        return $this->hasMany(MataPelajaran::class, 'kelas_id', 'id');
+    }
+
+    /**
+     * Get all of the laporanSiswa for the Kelas
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function laporanSiswa(): HasMany
+    {
+        return $this->hasMany(LaporanSiswa::class, 'kelas_id', 'id');
+    }
 }
