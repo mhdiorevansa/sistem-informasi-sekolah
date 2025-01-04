@@ -82,7 +82,7 @@ class LaporanSiswaResource extends Resource
                             ];
                         } else if ($record->kelas->nama_kelas === 'I A' || 'II A' || 'III A' || 'IV A' || 'V A') {
                             $options = [
-                                'belum naik kelas' => 'Belum Naik Kelas',
+                            'belum naik kelas' => 'Belum Naik Kelas',
                             'naik kelas' => 'Naik Kelas',
                             'tidak naik kelas' => 'Tidak Naik Kelas',
                             ];
