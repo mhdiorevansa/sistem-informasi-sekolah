@@ -19,6 +19,7 @@
 								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Izin</th>
 								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Sakit</th>
 								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Nilai</th>
+								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Keaktifan</th>
 						</tr>
 				</thead>
 				<tbody>
@@ -49,10 +50,13 @@
 												<td class="px-6 py-4 text-sm text-gray-900">
 														{{ $nilai->nilai ?? '-' }}
 												</td>
+												<td class="px-6 py-4 text-sm text-gray-900">
+														{{ $nilai->keaktifan ?? '-' }}
+												</td>
 										</tr>
 								@endforeach
 								<tr class="border-b">
-										<th class="px-6 py-3 text-end text-sm font-semibold" colspan="5">Total Nilai :
+										<th class="px-6 py-3 text-end text-sm font-semibold" colspan="6">Total Nilai :
 												{{ number_format($rataRataNilai, 2) }}
 										</th>
 								</tr>

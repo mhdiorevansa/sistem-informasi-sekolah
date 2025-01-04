@@ -74,13 +74,22 @@ class LaporanSiswaResource extends Resource
                 Select::make('status')
                     ->label('Status')
                     ->placeholder('Pilih Status')
-                    ->options([
-                        'belum naik kelas' => 'Belum Naik Kelas',
-                        'naik kelas' => 'Naik Kelas',
-                        'tidak naik kelas' => 'Tidak Naik Kelas',
-                        'lulus' => 'Lulus',
-                        'tidak lulus' => 'Tidak Lulus',
-                    ])
+                    ->options(function (LaporanSiswa $record) {
+                        if ($record->kelas->nama_kelas === 'XI A') {
+                            $options = [
+                                'lulus' => 'Lulus',
+                                'tidak lulus' => 'Tidak Lulus',
+                            ];
+                        } else if ($record->kelas->nama_kelas === 'I A' || 'II A' || 'III A' || 'IV A' || 'V A') {
+                            $options = [
+                                'belum naik kelas' => 'Belum Naik Kelas',
+                            'naik kelas' => 'Naik Kelas',
+                            'tidak naik kelas' => 'Tidak Naik Kelas',
+                            ];
+                        }
+                        return $options;
+                    })
+                    ->searchable()
                     ->disabled(function ($get) {
                         return $get('semester') == 1;
                     })
@@ -108,6 +117,10 @@ class LaporanSiswaResource extends Resource
                         TextInput::make('nilai')
                             ->label('Nilai')
                             ->placeholder('Masukkan Nilai')
+                            ->required(),
+                        TextInput::make('keaktifan')
+                            ->label('Keaktifan')
+                            ->placeholder('Masukkan Nilai Keaktifan')
                             ->required(),
                         TextInput::make('alfa')
                             ->label('Alfa')
@@ -182,9 +195,7 @@ class LaporanSiswaResource extends Resource
                             LaporanSiswa::where('siswa_id', $siswaId)->update([
                                 'status' => 'naik kelas'
                             ]);
-                            DataSiswa::where('id', $siswaId)->update([
-                                'kelas_id' => 2,
-                            ]);
+                            DataSiswa::where('id', $siswaId)->increment('kelas_id');
                             $dataSiswa = DataSiswa::find($siswaId);
                             for ($i = 1; $i <= 2; $i++) {
                                 LaporanSiswa::create([

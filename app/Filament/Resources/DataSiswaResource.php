@@ -54,7 +54,8 @@ class DataSiswaResource extends Resource
                     ->required(),
                 Select::make('kelas_id')
                     ->label('Kelas')
-                    ->relationship('kelas', 'nama_kelas')
+                    ->searchable()
+                    ->options(Kelas::all()->pluck('nama_kelas', 'id'))
                     ->placeholder('Pilih Kelas')
                     ->required(),
             ]);
