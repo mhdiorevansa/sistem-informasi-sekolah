@@ -61,4 +61,14 @@ class Kelas extends Model
     {
         return $this->hasMany(JadwalMataPelajaran::class, 'kelas_id', 'id');
     }
+
+    /**
+     * The ekstrakurikuler that belong to the Kelas
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function ekstrakurikuler(): BelongsToMany
+    {
+        return $this->belongsToMany(Ekstrakurikuler::class, 'ekstrakurikuler_kelas', 'kelas_id', 'ekstrakurikuler_id');
+    }
 }

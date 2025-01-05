@@ -29,8 +29,8 @@ class JadwalMataPelajaranResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationGroup = 'Manajemen Akademik';
-    protected static ?string $slug = 'jadwal-mapel-siswa';
-    protected static ?string $navigationLabel = 'Jadwal Mata Pelajaran';
+    protected static ?string $slug = 'jadwal-mapel';
+    protected static ?string $navigationLabel = 'Jadwal Pelajaran';
 
     public static function form(Form $form): Form
     {
