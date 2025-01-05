@@ -51,4 +51,14 @@ class Kelas extends Model
     {
         return $this->hasMany(LaporanSiswa::class, 'kelas_id', 'id');
     }
+
+    /**
+     * Get all of the jadwalMataPelajaran for the Kelas
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jadwalMataPelajaran(): HasMany
+    {
+        return $this->hasMany(JadwalMataPelajaran::class, 'kelas_id', 'id');
+    }
 }

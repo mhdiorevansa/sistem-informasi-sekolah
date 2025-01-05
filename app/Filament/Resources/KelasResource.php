@@ -48,7 +48,9 @@ class KelasResource extends Resource
                 TextColumn::make('jumlah_siswa')
                     ->label('Jumlah Siswa')
                     ->getStateUsing(function ($record) {
-                        return DataSiswa::where('kelas_id', $record->id)->count();
+                        return DataSiswa::where('kelas_id', $record->id)
+                            ->doesntHave('alumni')
+                            ->count();
                     })
                     ->default(0),
                 TextColumn::make('guru.nama_guru')

@@ -39,6 +39,12 @@ class GuruResource extends Resource
                         'pria' => 'pria',
                         'wanita' => 'wanita',
                     ])
+                    ->searchable()
+                    ->required(),
+                TextInput::make('nip')
+                    ->label('NIP')
+                    ->placeholder('Masukkan NIP')
+                    ->numeric()
                     ->required(),
                 TextInput::make('nomor_hp')
                     ->label('Nomor Hp')
@@ -50,6 +56,7 @@ class GuruResource extends Resource
                     ->placeholder('Masukkan Alamat')
                     ->required(),
                 Select::make('status')
+                    ->searchable()
                     ->label('Status')
                     ->options([
                         'aktif' => 'aktif',
@@ -68,6 +75,8 @@ class GuruResource extends Resource
                     ->searchable(),
                 TextColumn::make('jenis_kelamin')
                     ->label('Jenis Kelamin'),
+                TextColumn::make('nip')
+                    ->label('NIP'),
                 TextColumn::make('nomor_hp')
                     ->label('Nomor Hp'),
                 TextColumn::make('alamat')

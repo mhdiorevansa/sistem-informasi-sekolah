@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LaporanSiswaResource\Pages;
 use App\Filament\Resources\LaporanSiswaResource\RelationManagers;
+use App\Models\Alumni;
 use App\Models\DataSiswa;
 use App\Models\Kelas;
 use App\Models\LaporanSiswa;
@@ -45,24 +46,17 @@ class LaporanSiswaResource extends Resource
                     ->placeholder('Pilih Kelas')
                     ->options(Kelas::all()->pluck('nama_kelas', 'id'))
                     ->reactive()
-                    ->afterStateUpdated(function ($state, Set $set) {
-                        $set('siswa_id', null);
-                    })
+                    ->disabled()
                     ->searchable()
+                    ->dehydrated()
                     ->required(),
                 Select::make('siswa_id')
                     ->label('Siswa')
                     ->placeholder('Pilih Siswa')
-                    ->options(function ($get) {
-                        $kelasId = $get('kelas_id');
-                        return $kelasId
-                            ? LaporanSiswa::with('siswa')
-                            ->where('kelas_id', $kelasId)
-                            ->get()
-                            ->pluck('siswa.nama_lengkap', 'siswa_id')
-                            : [];
-                    })
+                    ->relationship('siswa', 'nama_lengkap')
+                    ->disabled()
                     ->searchable()
+                    ->dehydrated()
                     ->required(),
                 TextInput::make('semester')
                     ->label('Semester')
@@ -75,12 +69,12 @@ class LaporanSiswaResource extends Resource
                     ->label('Status')
                     ->placeholder('Pilih Status')
                     ->options(function (LaporanSiswa $record) {
-                        if ($record->kelas->nama_kelas === 'XI A') {
+                        if ($record->kelas->nama_kelas === 'VI') {
                             $options = [
                                 'lulus' => 'Lulus',
                                 'tidak lulus' => 'Tidak Lulus',
                             ];
-                        } else if ($record->kelas->nama_kelas === 'I A' || 'II A' || 'III A' || 'IV A' || 'V A') {
+                        } else if ($record->kelas->nama_kelas != 'VI') {
                             $options = [
                             'belum naik kelas' => 'Belum Naik Kelas',
                             'naik kelas' => 'Naik Kelas',
@@ -91,7 +85,7 @@ class LaporanSiswaResource extends Resource
                     })
                     ->searchable()
                     ->disabled(function ($get) {
-                        return $get('semester') == 1;
+                        return $get('semester') != '2';
                     })
                     ->required(),
                 Repeater::make('nilaiLaporanSiswa')
@@ -102,6 +96,9 @@ class LaporanSiswaResource extends Resource
                                 return MataPelajaran::with('kelas')
                                     ->get()
                                     ->groupBy('kelas.nama_kelas')
+                                    ->sortBy(function ($mataPelajaran, $kelasNama) {
+                                        return $mataPelajaran->first()->kelas->tingkatan;
+                                    })
                                     ->mapWithKeys(function ($mataPelajaran, $kelasNama) {
                                         $label = "Kelas $kelasNama";
                                         return [
@@ -141,7 +138,7 @@ class LaporanSiswaResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return LaporanSiswa::whereNotIn('status', ['naik kelas']);
+        return LaporanSiswa::whereNotIn('status', ['naik kelas', 'lulus']);
     }
 
     public static function table(Table $table): Table
@@ -156,10 +153,7 @@ class LaporanSiswaResource extends Resource
                     ->label('Nama Siswa')
                     ->searchable(),
                 TextColumn::make('siswa.nis')
-                    ->label('Nama Siswa')
-                    ->searchable(),
-                TextColumn::make('kelas.nama_kelas')
-                    ->label('Nama Kelas')
+                    ->label('NIS')
                     ->searchable(),
                 TextColumn::make('nilaiLaporanSiswa.nilai')
                     ->default('0')
@@ -195,22 +189,36 @@ class LaporanSiswaResource extends Resource
                             LaporanSiswa::where('siswa_id', $siswaId)->update([
                                 'status' => 'naik kelas'
                             ]);
-                            DataSiswa::where('id', $siswaId)->increment('kelas_id');
                             $dataSiswa = DataSiswa::find($siswaId);
-                            for ($i = 1; $i <= 2; $i++) {
-                                LaporanSiswa::create([
-                                    'siswa_id' => $siswaId,
-                                    'semester' => $i,
-                                    'status' => 'belum naik kelas',
-                                    'kelas_id' => $dataSiswa->kelas_id,
-                                    'created_at' => Carbon::now(),
-                                    'updated_at' => Carbon::now()
-                                ]);
-                            };
+                            $currentKelasId = $dataSiswa->kelas_id;
+                            $currentKelas = Kelas::find($currentKelasId);
+                            $nextKelas = Kelas::where('tingkatan', $currentKelas->tingkatan + 1)->first();
+                            if ($nextKelas) {
+                                $dataSiswa->kelas_id = $nextKelas->id;
+                                $dataSiswa->save();
+                                for ($i = 1; $i <= 2; $i++) {
+                                    LaporanSiswa::create([
+                                        'siswa_id' => $siswaId,
+                                        'semester' => $i,
+                                        'status' => 'belum naik kelas',
+                                        'kelas_id' => $nextKelas->id,
+                                        'created_at' => Carbon::now(),
+                                        'updated_at' => Carbon::now()
+                                    ]);
+                                };
+                            }
+                        } else if ($record->status === 'lulus') {
+                            $siswaId = $record->siswa_id;
+                            LaporanSiswa::where('siswa_id', $siswaId)->update([
+                                'status' => 'lulus'
+                            ]);
+                            Alumni::create([
+                                'siswa_id' => $siswaId
+                            ]);
                         }
                         return $record;
                     }),
-                Tables\Actions\DeleteAction::make()
+                // Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

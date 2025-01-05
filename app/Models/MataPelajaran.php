@@ -40,4 +40,14 @@ class MataPelajaran extends Model
     {
         return $this->belongsTo(Kelas::class, 'kelas_id', 'id');
     }
+
+    /**
+     * Get all of the jadwalMataPelajaran for the MataPelajaran
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jadwalMataPelajaran(): HasMany
+    {
+        return $this->hasMany(JadwalMataPelajaran::class, 'mata_pelajaran_id', 'id');
+    }
 }

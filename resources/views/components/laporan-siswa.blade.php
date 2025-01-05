@@ -11,7 +11,7 @@
 		<div class="mb-1">
 				<h3 class="font-semibold">Kelas {{ $groupKey }}</h3>
 		</div>
-		<table class="min-w-full bg-white">
+		<table class="min-w-full">
 				<thead>
 						<tr class="border-b border-t">
 								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Mata Pelajaran</th>

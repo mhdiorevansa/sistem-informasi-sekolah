@@ -24,7 +24,7 @@ class DataSiswaResource extends Resource
 {
     protected static ?string $model = DataSiswa::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static ?string $navigationIcon = 'heroicon-o-identification';
     protected static ?string $navigationGroup = 'Manajemen Siswa';
     protected static ?string $slug = 'data-siswa';
 
@@ -42,6 +42,13 @@ class DataSiswaResource extends Resource
                         'pria' => 'pria',
                         'wanita' => 'wanita',
                     ])
+                    ->searchable()
+                    ->required(),
+                Select::make('kelas_id')
+                    ->label('Kelas')
+                    ->searchable()
+                    ->options(Kelas::orderBy('tingkatan', 'asc')->pluck('nama_kelas', 'id'))
+                    ->placeholder('Pilih Kelas')
                     ->required(),
                 TextInput::make('nis')
                     ->label('NIS')
@@ -52,13 +59,15 @@ class DataSiswaResource extends Resource
                     ->label('Tanggal Lahir')
                     ->placeholder('Masukkan Tanggal Lahir')
                     ->required(),
-                Select::make('kelas_id')
-                    ->label('Kelas')
-                    ->searchable()
-                    ->options(Kelas::all()->pluck('nama_kelas', 'id'))
-                    ->placeholder('Pilih Kelas')
-                    ->required(),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return DataSiswa::doesntHave('alumni')
+        ->join('kelas', 'data_siswa.kelas_id', '=', 'kelas.id')
+        ->orderBy('kelas.tingkatan', 'asc')
+        ->select('data_siswa.*');
     }
 
     public static function table(Table $table): Table

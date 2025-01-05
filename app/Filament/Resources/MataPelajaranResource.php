@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MataPelajaranResource\Pages;
 use App\Filament\Resources\MataPelajaranResource\RelationManagers;
+use App\Models\Guru;
+use App\Models\Kelas;
 use App\Models\MataPelajaran;
 use Faker\Provider\ar_EG\Text;
 use Filament\Forms;
@@ -35,13 +37,15 @@ class MataPelajaranResource extends Resource
                     ->required(),
                 Select::make('pengampu')
                     ->label('Pengampu')
-                    ->relationship('guru', 'nama_guru')
+                    ->options(Guru::all()->pluck('nama_guru', 'id'))
                     ->placeholder('Pilih Pengampu')
+                    ->searchable()
                     ->required(),
                 Select::make('kelas_id')
                     ->label('Kelas')
-                    ->relationship('kelas', 'nama_kelas')
+                    ->options(Kelas::orderBy('tingkatan', 'asc')->pluck('nama_kelas', 'id'))
                     ->placeholder('Pilih Kelas')
+                    ->searchable()
                     ->required(),
                 TextInput::make('kode')
                     ->label('Kode Mata Pelajaran')
@@ -56,7 +60,6 @@ class MataPelajaranResource extends Resource
         return $table
             ->groups([
                 'kelas.nama_kelas',
-                'gender'
             ])
             ->defaultGroup('kelas.nama_kelas')
             ->columns([
@@ -65,9 +68,6 @@ class MataPelajaranResource extends Resource
                     ->searchable(),
                 TextColumn::make('guru.nama_guru')
                     ->label('Pengampu')
-                    ->searchable(),
-                TextColumn::make('kelas.nama_kelas')
-                    ->label('Kelas')
                     ->searchable(),
                 TextColumn::make('kode')
                     ->label('Kode')

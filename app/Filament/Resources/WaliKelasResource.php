@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WaliKelasResource\Pages;
 use App\Filament\Resources\WaliKelasResource\RelationManagers;
+use App\Models\Guru;
+use App\Models\Kelas;
 use App\Models\WaliKelas;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -28,7 +30,7 @@ class WaliKelasResource extends Resource
             ->schema([
                 Select::make('kelas_id')
                     ->label('Kelas')
-                    ->relationship('kelas', 'nama_kelas')
+                    ->options(fn() => Kelas::whereNotIn('id', WaliKelas::all()->pluck('kelas_id'))->orderBy('tingkatan', 'asc')->pluck('nama_kelas', 'id'))
                     ->placeholder('Pilih Kelas')
                     ->rules([
                         'unique:wali_kelas,kelas_id'
@@ -36,11 +38,13 @@ class WaliKelasResource extends Resource
                     ->validationMessages([
                         'unique' => 'Kelas ini sudah memiliki wali kelas',
                     ])
+                    ->searchable()
                     ->required(),
                 Select::make('guru_id')
                     ->label('Guru')
-                    ->relationship('guru', 'nama_guru')
+                    ->options(Guru::all()->pluck('nama_guru', 'id'))
                     ->placeholder('Pilih Guru')
+                    ->searchable()
                     ->required(),
             ]);
     }
@@ -51,9 +55,13 @@ class WaliKelasResource extends Resource
             ->columns([
                 TextColumn::make('kelas.nama_kelas')
                     ->label('Nama Kelas')
+                    ->formatStateUsing(fn ($record) => 'Kelas ' . $record->kelas->nama_kelas)
                     ->searchable(),
                 TextColumn::make('guru.nama_guru')
                     ->label('Nama Guru')
+                    ->searchable(),
+                TextColumn::make('guru.nip')
+                    ->label('NIP Guru')
                     ->searchable(),
             ])
             ->filters([

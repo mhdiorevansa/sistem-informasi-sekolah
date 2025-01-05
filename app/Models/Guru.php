@@ -30,4 +30,14 @@ class Guru extends Model
     {
         return $this->hasMany(MataPelajaran::class, 'pengampu', 'id');
     }
+
+    /**
+     * Get all of the jadwalMataPelajaran for the Guru
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jadwalMataPelajaran(): HasMany
+    {
+        return $this->hasMany(JadwalMataPelajaran::class, 'guru_id', 'id');
+    }
 }
