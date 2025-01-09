@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -39,5 +40,15 @@ class Guru extends Model
     public function jadwalMataPelajaran(): HasMany
     {
         return $this->hasMany(JadwalMataPelajaran::class, 'guru_id', 'id');
+    }
+
+    /**
+     * Get the user that owns the Guru
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\hasMany
+     */
+    public function asesmen(): hasMany
+    {
+        return $this->hasMany(AsesmenGuru::class, 'guru_id', 'id');
     }
 }
