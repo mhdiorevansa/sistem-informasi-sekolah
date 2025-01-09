@@ -11,12 +11,12 @@ class Ekstrakurikuler extends Model
     protected $guarded = [];
 
     /**
-     * The kelas that belong to the Ekstrakurikuler
+     * The siswa that belong to the Ekstrakurikuler
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function kelas(): BelongsToMany
+    public function siswa(): BelongsToMany
     {
-        return $this->belongsToMany(Kelas::class, 'ekstrakurikuler_kelas', 'ekstrakurikuler_id', 'kelas_id');
+        return $this->belongsToMany(DataSiswa::class, 'ekstrakurikuler_siswa', 'ekstrakurikuler_id', 'siswa_id');
     }
 }

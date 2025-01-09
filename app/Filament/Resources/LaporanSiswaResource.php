@@ -11,7 +11,7 @@ use App\Models\LaporanSiswa;
 use App\Models\MataPelajaran;
 use App\Models\NilaiLaporanSiswa;
 use Carbon\Carbon;
-use Filament\Actions\Action;
+use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -76,9 +76,9 @@ class LaporanSiswaResource extends Resource
                             ];
                         } else if ($record->kelas->nama_kelas != 'VI') {
                             $options = [
-                            'belum naik kelas' => 'Belum Naik Kelas',
-                            'naik kelas' => 'Naik Kelas',
-                            'tidak naik kelas' => 'Tidak Naik Kelas',
+                                'belum naik kelas' => 'Belum Naik Kelas',
+                                'naik kelas' => 'Naik Kelas',
+                                'tidak naik kelas' => 'Tidak Naik Kelas',
                             ];
                         }
                         return $options;
@@ -218,6 +218,22 @@ class LaporanSiswaResource extends Resource
                         }
                         return $record;
                     }),
+                Action::make('raport')
+                    ->label('Raport')
+                    ->color('info')
+                    ->icon('heroicon-o-document-text')
+                    ->modalHeading('Raport Siswa')
+                    ->modalWidth('4xl')
+                    ->modalContent(function (LaporanSiswa $record) {
+                        return view('filament.pages.laporan-siswa', [
+                            'groupedRaports' => $record->siswa->laporanSiswa
+                                ->load('nilaiLaporanSiswa')
+                                ->groupBy(fn($raport) => $raport->kelas->nama_kelas . ' - Semester ' . $raport->semester),
+                            'siswa' => $record->siswa,
+                        ]);
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false),
                 // Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([

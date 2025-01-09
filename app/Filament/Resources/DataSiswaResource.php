@@ -5,8 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DataSiswaResource\Pages;
 use App\Filament\Resources\DataSiswaResource\RelationManagers;
 use App\Models\DataSiswa;
+use App\Models\Ekstrakurikuler;
+use App\Models\EkstrakurikulerSiswa;
 use App\Models\Kelas;
 use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -65,9 +69,9 @@ class DataSiswaResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return DataSiswa::doesntHave('alumni')
-        ->join('kelas', 'data_siswa.kelas_id', '=', 'kelas.id')
-        ->orderBy('kelas.tingkatan', 'asc')
-        ->select('data_siswa.*');
+            ->join('kelas', 'data_siswa.kelas_id', '=', 'kelas.id')
+            ->orderBy('kelas.tingkatan', 'asc')
+            ->select('data_siswa.*');
     }
 
     public static function table(Table $table): Table
@@ -100,22 +104,30 @@ class DataSiswaResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                Action::make('raport')
-                    ->label('Raport')
-                    ->color('info')
-                    ->icon('heroicon-o-document-text')
-                    ->modalHeading('Raport Siswa')
-                    ->modalWidth('4xl')
-                    ->modalContent(function (DataSiswa $record) {
-                        return view('components.laporan-siswa', [
-                            'groupedRaports' => $record->laporanSiswa
-                                ->load('nilaiLaporanSiswa')
-                                ->groupBy(fn($raport) => $raport->kelas->nama_kelas . ' - Semester ' . $raport->semester),
-                            'siswa' => $record,
-                        ]);
+                Action::make('ekstrakurikulerSiswa')
+                    ->label('Ekskul')
+                    ->modalHeading(function (DataSiswa $record) {
+                        return 'Ekskul ' . $record->nama_lengkap;
                     })
-                    ->modalSubmitAction(false)
-                    ->modalCancelAction(false),
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->modalWidth('md')
+                    ->form([
+                        CheckboxList::make('ekskulId')
+                            ->label('PIlih Ekskul')
+                            ->options(Ekstrakurikuler::query()->pluck('nama_ekstrakurikuler', 'id'))
+                            ->default(fn (DataSiswa $record): array => $record->ekstrakurikuler->pluck('id')->toArray())
+                            ->required(),
+                    ])
+                    ->action(function (array $data, DataSiswa $record, Action $action): void {
+                        try {
+                            $record->ekstrakurikuler()->sync($data['ekskulId']);
+                            $action->success();
+                        } catch (\Throwable $th) {
+                            $action->failure();
+                            return;
+                        }
+                    })
+                    ->successNotificationTitle('Data berhasil disimpan'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
