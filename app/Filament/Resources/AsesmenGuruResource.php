@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class AsesmenGuruResource extends Resource
 {
     protected static ?string $model = AsesmenGuru::class;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static ?string $navigationGroup = 'Manajemen Guru';
     protected static ?string $slug = 'asesmen-guru';
 

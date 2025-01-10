@@ -54,6 +54,16 @@ class DataSiswa extends Model
         return $this->belongsToMany(Ekstrakurikuler::class, 'ekstrakurikuler_siswa', 'siswa_id', 'ekstrakurikuler_id');
     }
 
+    /**
+     * Get all of the pembayaranSpp for the DataSiswa
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pembayaranSpp(): HasMany
+    {
+        return $this->hasMany(PembayaranSpp::class, 'siswa_id', 'id');
+    }
+
     protected function namaLengkap(): Attribute
     {
         return Attribute::make(
