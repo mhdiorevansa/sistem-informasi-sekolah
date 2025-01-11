@@ -28,6 +28,8 @@ class PembayaranSppResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationGroup = 'Manajemen Siswa';
+    protected static ?string $navigationLabel = 'Pembayaran SPP';
+    protected static ?string $label = 'Pembayaran SPP';
     protected static ?string $slug = 'pembayaran-spp';
 
     public static function form(Form $form): Form
