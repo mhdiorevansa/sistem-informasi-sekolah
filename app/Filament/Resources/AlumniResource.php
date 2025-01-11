@@ -20,7 +20,9 @@ class AlumniResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static ?string $navigationGroup = 'Manajemen Siswa';
-    protected static ?string $slug = 'alumni';
+    protected static ?string $navigationLabel = 'Data Alumni';
+    protected static ?string $slug = 'data-alumni';
+    protected static ?string $label = 'Data Alumni';
 
     public static function form(Form $form): Form
     {

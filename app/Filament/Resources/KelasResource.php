@@ -23,6 +23,9 @@ class KelasResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationGroup = 'Manajemen Siswa';
+    protected static ?string $navigationLabel = 'Data Kelas';
+    protected static ?string $slug = 'data-kelas';
+    protected static ?string $label = 'Data Kelas';
 
     public static function form(Form $form): Form
     {

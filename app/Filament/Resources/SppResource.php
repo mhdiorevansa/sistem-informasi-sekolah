@@ -20,9 +20,11 @@ class SppResource extends Resource
 {
     protected static ?string $model = Spp::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
     protected static ?string $navigationGroup = 'Manajemen Akademik';
-    protected static ?string $slug = 'spp';
+    protected static ?string $navigationLabel = 'Data SPP';
+    protected static ?string $slug = 'data-spp';
+    protected static ?string $label = 'Data SPP';
 
     public static function form(Form $form): Form
     {

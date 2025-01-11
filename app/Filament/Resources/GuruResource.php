@@ -23,7 +23,9 @@ class GuruResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Manajemen Guru';
-    protected static ?string $slug = 'guru';
+    protected static ?string $navigationLabel = 'Data Guru';
+    protected static ?string $slug = 'data-guru';
+    protected static ?string $label = 'Data Guru';
 
     public static function form(Form $form): Form
     {
